@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity Bank — Trusted Digital Banking</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0a1628;
+      --blue-dark: #0f2d5e;
+      --blue:      #1a4fa0;
+      --blue-mid:  #2563eb;
+      --blue-lite: #3b82f6;
+      --accent:    #60a5fa;
+      --sky:       #e0f0ff;
+      --white:     #ffffff;
+      --gray-50:   #f8faff;
+      --gray-100:  #eef2f9;
+      --gray-300:  #c8d6ec;
+      --gray-500:  #6b87b0;
+      --success:   #10b981;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--white);
+      color: var(--navy);
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 3rem;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(10,22,40,0.96);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 24px rgba(0,0,0,0.3);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--white);
+    }
+    .nav-brand .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--blue-mid);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-brand span {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.4rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: white; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-nav-login {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      transition: all 0.2s;
+    }
+    .btn-nav-login:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    .btn-nav-cta {
+      background: var(--blue-mid);
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 20px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(37,99,235,0.4);
+    }
+    .btn-nav-cta:hover { background: var(--blue); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--navy);
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Geometric background pattern */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(37,99,235,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(96,165,250,0.1) 0%, transparent 60%);
+    }
+
+    /* Floating grid lines */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(96,165,250,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(96,165,250,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Floating circles */
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(96,165,250,0.12);
+      animation: float 8s ease-in-out infinite;
+    }
+    .circle-1 { width: 500px; height: 500px; top: -100px; right: -100px; animation-delay: 0s; }
+    .circle-2 { width: 300px; height: 300px; top: 100px; right: 200px; animation-delay: -2s; border-color: rgba(37,99,235,0.15); }
+    .circle-3 { width: 200px; height: 200px; bottom: 100px; left: 5%; animation-delay: -4s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 7rem 3rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37,99,235,0.15);
+      border: 1px solid rgba(37,99,235,0.3);
+      border-radius: 2rem;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      font-weight: 400;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 2.2rem;
+      max-width: 440px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      background: var(--blue-mid);
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 12px;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-hero-primary:hover {
+      background: var(--blue);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(37,99,235,0.5);
+    }
+
+    .btn-hero-secondary {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      transition: all 0.25s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-hero-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
+
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .trust-item i { color: var(--success); font-size: 11px; }
+
+    /* Hero right — floating cards */
+    .hero-visual {
+      position: relative;
+      height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-mockup {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%);
+      border-radius: 20px;
+      padding: 1.8rem;
+      width: 300px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      position: relative;
+      z-index: 2;
+      animation: cardFloat 6s ease-in-out infinite;
+    }
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-12px) rotate(-1deg); }
+    }
+
+    .card-chip {
+      width: 38px; height: 28px;
+      background: linear-gradient(135deg, #f0c040, #d4a017);
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+    }
+    .card-number {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.2em;
+      margin-bottom: 1.2rem;
+      font-family: monospace;
+    }
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .card-name { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 600; }
+    .card-expiry { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .card-logo { font-size: 22px; color: rgba(255,255,255,0.8); }
+
+    /* Floating mini cards */
+    .mini-card {
+      position: absolute;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .mini-card-1 {
+      top: 20px; right: 0;
+      animation: miniFloat1 5s ease-in-out infinite;
+    }
+    .mini-card-2 {
+      bottom: 40px; left: -20px;
+      animation: miniFloat2 7s ease-in-out infinite;
+    }
+    @keyframes miniFloat1 {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes miniFloat2 {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    .mini-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .mini-icon.green { background: rgba(16,185,129,0.2); color: var(--success); }
+    .mini-icon.blue  { background: rgba(37,99,235,0.2);  color: var(--accent); }
+
+    .mini-text { display: flex; flex-direction: column; }
+    .mini-label { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .mini-value { font-size: 13px; font-weight: 700; color: white; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--blue-dark);
+      padding: 2.5rem 3rem;
+    }
+    .stats-bar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+    .stat-item-num {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.2rem;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .stat-item-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      background: var(--gray-50);
+      padding: 6rem 3rem;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue-mid);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      text-align: center;
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      color: var(--navy);
+      font-weight: 400;
+      margin-bottom: 0.8rem;
+    }
+    .section-sub {
+      text-align: center;
+      font-size: 15px;
+      color: var(--gray-500);
+      max-width: 480px;
+      margin: 0 auto 3.5rem;
+      line-height: 1.7;
+    }
+
+    .features-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid var(--gray-100);
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 32px rgba(10,22,40,0.1);
+      transform: translateY(-4px);
+      border-color: var(--gray-300);
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue-mid), var(--accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .feature-card:hover::after { transform: scaleX(1); }
+
+    .feature-icon {
+      width: 52px; height: 52px;
+      background: var(--sky);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      color: var(--blue-mid);
+      margin-bottom: 1.2rem;
+    }
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: var(--gray-500);
+      line-height: 1.7;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      background: var(--navy);
+      padding: 6rem 3rem;
+    }
+    .how .section-title { color: white; }
+    .how .section-sub { color: rgba(255,255,255,0.5); }
+
+    .steps-grid {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      position: relative;
+    }
+
+    .step-card {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .step-num-circle {
+      width: 56px; height: 56px;
+      background: var(--blue-mid);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 auto 1.2rem;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+    }
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+    }
+    .step-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      background: var(--blue-mid);
+      padding: 5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(255,255,255,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 50%, rgba(10,22,40,0.2) 0%, transparent 60%);
+    }
+    .cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+    .cta-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: white;
+      font-weight: 400;
+      margin-bottom: 1rem;
+    }
+    .cta-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .btn-cta-white {
+      background: white;
+      color: var(--blue-mid);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      padding: 3rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: white;
+    }
+    .footer-brand .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--blue-mid);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .footer-brand span {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.2rem;
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+    }
+    .footer-socials {
+      display: flex;
+      gap: 12px;
+    }
+    .social-link {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 15px;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .social-link:hover { background: var(--blue-mid); color: white; border-color: var(--blue-mid); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 1.2rem; }
+      .nav-links { display: none; }
+      .hero-content { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; gap: 3rem; }
+      .hero-visual { height: 300px; }
+      .card-mockup { width: 250px; }
+      .stats-bar { padding: 2rem 1.5rem; }
+      .stats-bar-inner { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+      .features { padding: 4rem 1.5rem; }
+      .how { padding: 4rem 1.5rem; }
+      .cta-section { padding: 4rem 1.5rem; }
+      footer { padding: 2rem 1.5rem; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+
+    /* Entrance animations */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a class="nav-brand" href="index.html">
+      <div class="logo-icon"><i class="fas fa-university"></i></div>
+      <span>Unity Bank</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-nav-login">Login</a>
+      <a href="register.html" class="btn-nav-cta">Open Account</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+
+    <div class="hero-content">
+      <!-- Left -->
+      <div>
+        <div class="hero-badge">
+          <div class="dot"></div>
+          Trusted Digital Banking
+        </div>
+        <h1 class="hero-title">
+          Banking that puts <em>your money</em> first
+        </h1>
+        <p class="hero-subtitle">
+          Send, receive and manage your money with confidence. Unity Bank gives you full control of your finances — secure, instant, and always available.
+        </p>
+        <div class="hero-actions">
+          <a href="register.html" class="btn-hero-primary">
+            Open Free Account <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="login.html" class="btn-hero-secondary">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </a>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-item"><i class="fas fa-check-circle"></i> No hidden fees</div>
+          <div class="trust-item"><i class="fas fa-check-circle"></i> Instant transfers</div>
+          <div class="trust-item"><i class="fas fa-check-circle"></i> Secure & encrypted</div>
+        </div>
+      </div>
+
+      <!-- Right — Card Visual -->
+      <div class="hero-visual">
+        <div class="card-mockup">
+          <div class="card-chip"></div>
+          <div class="card-number">•••• •••• •••• 4821</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-name">Unity Member</div>
+              <div class="card-expiry">Expires 12/28</div>
+            </div>
+            <div class="card-logo"><i class="fas fa-university"></i></div>
+          </div>
+        </div>
+
+        <!-- Floating mini cards -->
+        <div class="mini-card mini-card-1">
+          <div class="mini-icon green"><i class="fas fa-arrow-down"></i></div>
+          <div class="mini-text">
+            <span class="mini-label">Money received</span>
+            <span class="mini-value">+ $2,400.00</span>
+          </div>
+        </div>
+
+        <div class="mini-card mini-card-2">
+          <div class="mini-icon blue"><i class="fas fa-shield-alt"></i></div>
+          <div class="mini-text">
+            <span class="mini-label">Security status</span>
+            <span class="mini-value">Protected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="stats-bar-inner">
+      <div>
+        <div class="stat-item-num">100%</div>
+        <div class="stat-item-label">Secure Transactions</div>
+      </div>
+      <div>
+        <div class="stat-item-num">$15K</div>
+        <div class="stat-item-label">Transfer Limit</div>
+      </div>
+      <div>
+        <div class="stat-item-num">24/7</div>
+        <div class="stat-item-label">Always Available</div>
+      </div>
+      <div>
+        <div class="stat-item-num">Instant</div>
+        <div class="stat-item-label">Money Transfers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-label">Why Unity Bank</div>
+    <h2 class="section-title">Everything you need in one place</h2>
+    <p class="section-sub">Simple, powerful tools to manage your money the way you want.</p>
+
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><i class="fas fa-paper-plane"></i></div>
+        <div class="feature-title">Instant Transfers</div>
+        <div class="feature-desc">Send money to anyone on Unity Bank instantly. No delays, no processing fees — your money moves at the speed of a click.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.1s">
+        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="feature-title">Bank-grade Security</div>
+        <div class="feature-desc">Your account is protected with JWT authentication and encrypted passwords. Every session is verified and secured.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.2s">
+        <div class="feature-icon"><i class="fas fa-history"></i></div>
+        <div class="feature-title">Full Transaction History</div>
+        <div class="feature-desc">Every rupee tracked. See all your sent and received transactions with exact timestamps in your dashboard.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.3s">
+        <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+        <div class="feature-title">Live Balance Updates</div>
+        <div class="feature-desc">Your balance updates in real time after every transaction. Always know exactly how much you have available.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.4s">
+        <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+        <div class="feature-title">Works on Any Device</div>
+        <div class="feature-desc">Fully responsive design means your banking dashboard looks great on phone, tablet, or desktop — anytime, anywhere.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:0.5s">
+        <div class="feature-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="feature-title">Free to Join</div>
+        <div class="feature-desc">Open an account in under a minute. No paperwork, no visits — just register with your email and start banking.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-label" style="color:var(--accent)">Simple Process</div>
+    <h2 class="section-title">Up and running in 3 steps</h2>
+    <p class="section-sub">No complexity, no waiting. Start banking in minutes.</p>
+
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <div class="step-num-circle">1</div>
+        <div class="step-title">Create your account</div>
+        <div class="step-desc">Register with your name and email. Your account is created instantly with a starting balance.</div>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.15s">
+        <div class="step-num-circle">2</div>
+        <div class="step-title">Log in securely</div>
+        <div class="step-desc">Sign in with your credentials. A secure JWT token keeps your session protected throughout.</div>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.3s">
+        <div class="step-num-circle">3</div>
+        <div class="step-title">Send & receive money</div>
+        <div class="step-desc">Use your dashboard to transfer funds to any Unity Bank member. Track every transaction live.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-inner fade-up">
+      <h2 class="cta-title">Ready to start banking smarter?</h2>
+      <p class="cta-sub">Join Unity Bank today. Open your free account in under a minute and take full control of your money.</p>
+      <a href="register.html" class="btn-cta-white">
+        Get Started — It's Free <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <a class="footer-brand" href="index.html">
+        <div class="logo-icon"><i class="fas fa-university"></i></div>
+        <span>Unity Bank</span>
+      </a>
+      <div class="footer-copy">
+        Built by Suman Kalyan Sahoo &copy; 2024
+      </div>
+      <div class="footer-socials">
+        <a href="https://github.com/SumanKalyanSahoo" target="_blank" class="social-link">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/suman-kalyan-sahoo-824292232/" target="_blank" class="social-link">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Sticky navbar on scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+    // Add scrolled class immediately if page loads scrolled
+    if (window.scrollY > 40) navbar.classList.add('scrolled');
+
+    // Scroll-triggered fade-up animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // If already logged in, change CTA buttons to "Go to Dashboard"
+    if (localStorage.getItem('token')) {
+      document.querySelectorAll('a[href="register.html"]').forEach(a => {
+        a.href = 'customers.html';
+        a.innerHTML = a.innerHTML.replace('Open Free Account', 'Go to Dashboard').replace("Get Started — It's Free", 'Go to Dashboard');
+      });
+      document.querySelectorAll('a[href="login.html"]').forEach(a => {
+        if (a.classList.contains('btn-nav-login')) {
+          a.href = 'customers.html';
+          a.textContent = 'Dashboard';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Unity Bank</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4ff; }
+
+    /* ── NAVBAR ── */
+    .navbar { background: #0a1628 !important; padding: 0 1.5rem; height: 64px; box-shadow: 0 2px 20px rgba(0,0,0,0.35); }
+    .navbar-brand { font-family: 'Instrument Serif', serif; font-size: 1.3rem; color: white !important; display: flex; align-items: center; gap: 10px; }
+    .navbar-brand .logo-box { width: 34px; height: 34px; background: #2563eb; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .btn-user-profile { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #93c5fd !important; border-radius: 8px; padding: 5px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background .2s; text-decoration: none; }
+    .btn-user-profile:hover { background: rgba(255,255,255,0.13); color: #fff !important; }
+    .btn-user-profile .av { width: 28px; height: 28px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+    .btn-logout-nav { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5 !important; border-radius: 8px; padding: 5px 14px; font-size: 13px; transition: background .2s; }
+    .btn-logout-nav:hover { background: rgba(239,68,68,0.25); color: #fff !important; }
+
+    /* ── STAT CARDS ── */
+    .stat-card { border-radius: 14px; border: none; box-shadow: 0 2px 12px rgba(10,22,40,0.08); transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(10,22,40,0.14); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #2563eb, #60a5fa); border-radius: 14px 14px 0 0; }
+    .stat-card.main-card { background: linear-gradient(135deg, #0f2d5e, #1a4fa0); color: white; }
+    .stat-card.main-card::before { background: rgba(255,255,255,0.25); }
+    .stat-card.main-card .text-muted { color: rgba(255,255,255,0.6) !important; }
+    .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+    /* ── TABLE ── */
+    .table-card { border-radius: 14px; border: none; box-shadow: 0 2px 12px rgba(10,22,40,0.08); overflow: hidden; }
+    .table > :not(caption) > * > * { padding: .85rem 1rem; }
+    .table thead th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #6b87b0; background: #f8faff; border-bottom: 2px solid #eef2f9; white-space: nowrap; }
+    .table tbody tr { transition: background .12s; }
+    .table tbody tr:hover { background: #f8faff; }
+
+    /* ── BADGES ── */
+    .tx-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .tx-sent     { background: rgba(239,68,68,0.08);  color: #ef4444; }
+    .tx-received { background: rgba(16,185,129,0.08); color: #10b981; }
+    .tx-deposit  { background: rgba(37,99,235,0.08);  color: #2563eb; }
+    .amt-sent     { color: #ef4444; font-weight: 700; }
+    .amt-received { color: #10b981; font-weight: 700; }
+    .amt-deposit  { color: #2563eb; font-weight: 700; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 3.5rem 1rem; }
+    .empty-state i { font-size: 2.8rem; color: #c8d6ec; display: block; margin-bottom: .8rem; }
+    .empty-state p { color: #6b87b0; font-size: 14px; margin: 0; }
+
+    /* ── PIN BOXES ── */
+    .pin-row { display: flex; gap: 10px; justify-content: center; margin: 10px 0 14px; }
+    .pin-box { width: 54px; height: 54px; border: 2px solid #c8d6ec; border-radius: 12px; font-size: 1.5rem; text-align: center; font-family: inherit; color: #0a1628; background: #fff; outline: none; transition: border-color .2s, box-shadow .2s; }
+    .pin-box:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+
+    /* ── STEP BAR ── */
+    .step-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 1.2rem; }
+    .s-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; transition: all .3s; }
+    .s-dot.active   { background: #2563eb; color: white; }
+    .s-dot.done     { background: #10b981; color: white; }
+    .s-dot.inactive { background: #eef2f9; color: #6b87b0; }
+    .s-dot.active-g { background: #059669; color: white; }
+    .s-line { flex: 1; height: 2px; border-radius: 2px; transition: background .3s; }
+    .s-line.done { background: #10b981; }
+    .s-line.inactive { background: #eef2f9; }
+
+    /* ── PROFILE CARD ── */
+    .profile-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, #2563eb, #1a4fa0); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: white; margin: 0 auto 1rem; }
+    .profile-upi { background: #e0f0ff; border: 1px solid rgba(37,99,235,.2); border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #1a4fa0; font-family: monospace; letter-spacing: .03em; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .profile-upi:hover { background: #c7e3ff; }
+    .acc-badge { background: #f8faff; border: 1px solid #eef2f9; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #0a1628; font-family: monospace; display: flex; align-items: center; justify-content: space-between; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eef2f9; font-size: 13px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: #6b87b0; }
+    .info-row .value { font-weight: 600; color: #0a1628; }
+
+    /* ── UPI LOOKUP ── */
+    .upi-found { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.2); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #065f46; display: none; align-items: center; gap: 8px; margin-top: 6px; }
+    .upi-found.show { display: flex; }
+
+    /* ── QUICK PILLS ── */
+    .q-pill { background: #e0f0ff; color: #1a4fa0; border: 1px solid rgba(37,99,235,.2); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .q-pill:hover { background: #2563eb; color: white; border-color: #2563eb; }
+
+    /* ── SUMMARY BOX ── */
+    .summary-box { background: #f8faff; border: 1px solid #eef2f9; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #0a1628; line-height: 1.8; }
+
+    /* page fade-in */
+    .page-wrap { animation: fadeUp .4s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <div class="logo-box"><i class="fas fa-university"></i></div>
+        Unity Bank
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        <a href="#" class="btn-user-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+          <div class="av" id="navAvatar">U</div>
+          <span id="navName">Loading...</span>
+          <i class="fas fa-chevron-down" style="font-size:10px;opacity:.6"></i>
+        </a>
+        <a href="#" class="btn btn-logout-nav" onclick="logout()">
+          <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="container py-4 page-wrap" style="max-width:1100px">
+
+    <!-- Header -->
+    <div class="mb-4">
+      <h4 style="font-family:'Instrument Serif',serif;font-weight:400;color:#0a1628">
+        Hello, <span id="headerName">there</span> 👋
+      </h4>
+      <p class="text-muted mb-0" style="font-size:14px">Here's your financial overview — <span id="todayDate"></span></p>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="card stat-card main-card p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted mb-1" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Available Balance</p>
+              <h4 class="mb-0 fw-bold text-white">₹<span id="myAccountBalance">—</span></h4>
+              <p class="text-muted mb-0 mt-1" style="font-size:11px">Unity Bank Savings Account</p>
+            </div>
+            <div class="stat-icon" style="background:rgba(255,255,255,.15);color:white"><i class="fas fa-wallet"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card stat-card bg-white p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted mb-1" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Total Sent</p>
+              <h4 class="mb-0 fw-bold" id="totalSent">₹0</h4>
+              <p class="text-muted mb-0 mt-1" style="font-size:11px">All outgoing transfers</p>
+            </div>
+            <div class="stat-icon" style="background:#e0f0ff;color:#2563eb"><i class="fas fa-arrow-up"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card stat-card bg-white p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted mb-1" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Total Added</p>
+              <h4 class="mb-0 fw-bold" id="totalDeposited">₹0</h4>
+              <p class="text-muted mb-0 mt-1" style="font-size:11px">Self deposits</p>
+            </div>
+            <div class="stat-icon" style="background:#d1fae5;color:#059669"><i class="fas fa-plus-circle"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card stat-card bg-white p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted mb-1" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Transactions</p>
+              <h4 class="mb-0 fw-bold" id="totalTx">0</h4>
+              <p class="text-muted mb-0 mt-1" style="font-size:11px">Total on this account</p>
+            </div>
+            <div class="stat-icon" style="background:#e0f0ff;color:#2563eb"><i class="fas fa-exchange-alt"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 flex-wrap mb-4">
+      <button class="btn btn-primary px-4" onclick="openSend()">
+        <i class="fas fa-paper-plane me-2"></i>Send Money
+      </button>
+      <button class="btn px-4" style="background:#059669;color:white" onclick="openAdd()">
+        <i class="fas fa-plus-circle me-2"></i>Add Money
+      </button>
+      <button class="btn btn-outline-primary px-4" onclick="loadDashboard().then(()=>loadHistory())">
+        <i class="fas fa-sync-alt me-2"></i>Refresh
+      </button>
+      <button class="btn btn-outline-secondary px-4" onclick="openScanner()">
+        <i class="fas fa-camera me-2"></i>Scan & Pay
+      </button>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="card table-card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4" style="border-bottom:1px solid #eef2f9">
+        <h6 class="mb-0 fw-bold" style="color:#0a1628">
+          <i class="fas fa-history text-primary me-2"></i>Transaction History
+        </h6>
+        <span class="badge" id="txCount" style="background:#e0f0ff;color:#1a4fa0;font-size:11px">0 transactions</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Person</th>
+              <th>UPI ID</th>
+              <th>Amount</th>
+              <th>Date & Time</th>
+            </tr>
+          </thead>
+          <tbody id="tx-body">
+            <tr><td colspan="5">
+              <div class="empty-state">
+                <i class="fas fa-receipt"></i>
+                <p>No transactions yet</p>
+                <small class="text-muted">Add money or send to get started</small>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE MODAL ══ -->
+  <div class="modal fade" id="profileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius:20px">
+        <div class="modal-header border-0 pb-0">
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body px-4 pb-4">
+          <div class="text-center mb-3">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <h5 class="fw-bold mb-1" id="profileName">—</h5>
+            <p class="text-muted mb-0" style="font-size:13px" id="profileEmail">—</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6b87b0">UPI ID</label>
+            <div class="profile-upi" id="profileUpi" onclick="copyUpi()">
+              <span id="profileUpiText">—</span>
+              <i class="fas fa-copy text-primary" style="font-size:12px"></i>
+            </div>
+            <small class="text-muted">Click to copy your UPI ID</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6b87b0">Account Number</label>
+            <div class="acc-badge">
+              <span id="profileAccNo">—</span>
+              <i class="fas fa-shield-alt text-success" style="font-size:12px"></i>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6b87b0">Account Details</label>
+            <div>
+              <div class="info-row">
+                <span class="label">Balance</span>
+                <span class="value text-primary">₹<span id="profileBalance">—</span></span>
+              </div>
+              <div class="info-row">
+                <span class="label">Account Type</span>
+                <span class="value">Savings Account</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Bank</span>
+                <span class="value">Unity Bank</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Member Since</span>
+                <span class="value" id="profileSince">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- My QR Code -->
+          <button class="btn btn-outline-primary w-100 mb-3 fw-semibold" onclick="toggleMyQR()" id="showQrBtn">
+            <i class="fas fa-qrcode me-2"></i>Show My QR Code
+          </button>
+          <div id="myQrSection" style="display:none">
+            <div class="text-center p-3 mb-2" style="background:#f8faff;border-radius:12px;border:1px solid #eef2f9">
+              <div id="myQrCode" class="d-flex justify-content-center mb-2"></div>
+              <p class="mb-1 fw-bold" style="font-size:13px" id="qrUpiLabel">—</p>
+              <small class="text-muted">Ask others to scan this to pay you</small>
+              <div class="mt-2">
+                <button class="btn btn-sm btn-success" onclick="downloadQR()">
+                  <i class="fas fa-download me-1"></i>Download QR
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="copyToast" class="alert alert-success py-2 text-center mb-0" style="display:none;font-size:13px;border-radius:8px">
+            <i class="fas fa-check-circle me-1"></i>UPI ID copied to clipboard!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SEND MONEY MODAL ══ -->
+  <div class="modal fade" id="sendModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius:20px">
+        <div class="modal-body p-4">
+
+          <!-- Step bar -->
+          <div class="step-bar mb-3">
+            <div class="s-dot active" id="ss1">1</div>
+            <div class="s-line inactive" id="sl1"></div>
+            <div class="s-dot inactive" id="ss2">2</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fas fa-paper-plane text-primary me-2"></i>Send Money</h5>
+            <button class="btn-close" onclick="closeSend()"></button>
+          </div>
+
+          <!-- Step 1 -->
+          <div id="s-step1">
+            <div class="alert alert-info py-2 mb-3" style="font-size:13px;border-radius:10px">
+              <i class="fas fa-info-circle me-1"></i>Transfer limit: <strong>₹1,00,000</strong> per transaction
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold" style="font-size:12px">Recipient UPI ID</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                <input type="text" id="sUpi" class="form-control" placeholder="e.g. rahul1234@unitybank" oninput="onUpiInput()">
+                <button class="btn btn-outline-primary" onclick="lookupUpi()" type="button" id="lookupBtn">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+              <div class="upi-found" id="upiFound">
+                <i class="fas fa-user-check"></i>
+                <span id="upiFoundName"></span>
+              </div>
+              <div class="text-danger mt-1" style="font-size:12px;display:none" id="upiNotFound"></div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold" style="font-size:12px">Amount (₹ INR)</label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" id="sAmt" class="form-control" placeholder="0.00" min="1" max="100000">
+              </div>
+            </div>
+
+            <div class="alert alert-danger py-2 mb-3" id="sErr" style="display:none;font-size:13px;border-radius:10px"></div>
+            <button class="btn btn-primary w-100 py-2 fw-bold" onclick="sendStep2()">
+              Continue <i class="fas fa-arrow-right ms-1"></i>
+            </button>
+          </div>
+
+          <!-- Step 2: PIN -->
+          <div id="s-step2" style="display:none">
+            <button class="btn btn-link text-muted p-0 mb-3" onclick="sendBack()">
+              <i class="fas fa-arrow-left me-1"></i>Go back
+            </button>
+            <div class="alert alert-success py-2 mb-3" style="font-size:13px;border-radius:10px">
+              <i class="fas fa-lock me-1"></i>Enter your <strong>4-digit PIN</strong> to confirm
+            </div>
+            <div class="summary-box mb-3" id="sSummary"></div>
+            <label class="form-label fw-semibold text-center d-block" style="font-size:12px">Enter your PIN</label>
+            <div class="pin-row">
+              <input class="pin-box" type="password" id="sp0" maxlength="1" inputmode="numeric" oninput="mp('sp',0)" onkeydown="bp(event,'sp',0)">
+              <input class="pin-box" type="password" id="sp1" maxlength="1" inputmode="numeric" oninput="mp('sp',1)" onkeydown="bp(event,'sp',1)">
+              <input class="pin-box" type="password" id="sp2" maxlength="1" inputmode="numeric" oninput="mp('sp',2)" onkeydown="bp(event,'sp',2)">
+              <input class="pin-box" type="password" id="sp3" maxlength="1" inputmode="numeric" oninput="mp('sp',3)" onkeydown="bp(event,'sp',3)">
+            </div>
+            <div class="alert alert-danger py-2 mb-2" id="spErr" style="display:none;font-size:13px;border-radius:10px"></div>
+            <div class="alert alert-success py-2 mb-2" id="spOk" style="display:none;font-size:13px;border-radius:10px"></div>
+            <button class="btn btn-primary w-100 py-2 fw-bold" id="sSendBtn" onclick="doSend()">
+              <span id="sSendTxt"><i class="fas fa-paper-plane me-2"></i>Send Money</span>
+              <span id="sSpin" class="spinner-border spinner-border-sm ms-2" style="display:none"></span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ADD MONEY MODAL ══ -->
+  <div class="modal fade" id="addModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius:20px">
+        <div class="modal-body p-4">
+
+          <div class="step-bar mb-3">
+            <div class="s-dot active-g" id="as1">1</div>
+            <div class="s-line inactive" id="al1"></div>
+            <div class="s-dot inactive" id="as2">2</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0" style="color:#059669"><i class="fas fa-plus-circle me-2"></i>Add Money</h5>
+            <button class="btn-close" onclick="closeAdd()"></button>
+          </div>
+
+          <!-- Step 1 -->
+          <div id="a-step1">
+            <div class="alert py-2 mb-3" style="background:#d1fae5;border:1px solid rgba(5,150,105,.2);color:#065f46;font-size:13px;border-radius:10px">
+              <i class="fas fa-info-circle me-1"></i>Maximum <strong>₹1,00,000</strong> can be added at once
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold" style="font-size:12px">Amount to Add (₹ INR)</label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" id="aAmt" class="form-control" placeholder="0.00" min="1" max="100000">
+              </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <button class="q-pill" onclick="setA(500)">₹500</button>
+              <button class="q-pill" onclick="setA(1000)">₹1,000</button>
+              <button class="q-pill" onclick="setA(5000)">₹5,000</button>
+              <button class="q-pill" onclick="setA(10000)">₹10,000</button>
+              <button class="q-pill" onclick="setA(50000)">₹50,000</button>
+            </div>
+            <div class="alert alert-danger py-2 mb-3" id="aErr" style="display:none;font-size:13px;border-radius:10px"></div>
+            <button class="btn w-100 py-2 fw-bold text-white" style="background:#059669" onclick="addStep2()">
+              Continue <i class="fas fa-arrow-right ms-1"></i>
+            </button>
+          </div>
+
+          <!-- Step 2: PIN -->
+          <div id="a-step2" style="display:none">
+            <button class="btn btn-link text-muted p-0 mb-3" onclick="addBack()">
+              <i class="fas fa-arrow-left me-1"></i>Go back
+            </button>
+            <div class="alert py-2 mb-3" style="background:#d1fae5;border:1px solid rgba(5,150,105,.2);color:#065f46;font-size:13px;border-radius:10px">
+              <i class="fas fa-shield-alt me-1"></i>Enter your <strong>4-digit PIN</strong> to add money
+            </div>
+            <div class="summary-box mb-3" id="aSummary"></div>
+            <label class="form-label fw-semibold text-center d-block" style="font-size:12px">Enter your PIN</label>
+            <div class="pin-row">
+              <input class="pin-box" type="password" id="ap0" maxlength="1" inputmode="numeric" oninput="mp('ap',0)" onkeydown="bp(event,'ap',0)">
+              <input class="pin-box" type="password" id="ap1" maxlength="1" inputmode="numeric" oninput="mp('ap',1)" onkeydown="bp(event,'ap',1)">
+              <input class="pin-box" type="password" id="ap2" maxlength="1" inputmode="numeric" oninput="mp('ap',2)" onkeydown="bp(event,'ap',2)">
+              <input class="pin-box" type="password" id="ap3" maxlength="1" inputmode="numeric" oninput="mp('ap',3)" onkeydown="bp(event,'ap',3)">
+            </div>
+            <div class="alert alert-danger py-2 mb-2" id="apErr" style="display:none;font-size:13px;border-radius:10px"></div>
+            <div class="alert alert-success py-2 mb-2" id="apOk" style="display:none;font-size:13px;border-radius:10px"></div>
+            <button class="btn w-100 py-2 fw-bold text-white" id="aAddBtn" style="background:#059669" onclick="doAdd()">
+              <span id="aAddTxt"><i class="fas fa-plus-circle me-2"></i>Add Money</span>
+              <span id="aSpin" class="spinner-border spinner-border-sm ms-2" style="display:none"></span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+    const tok = () => localStorage.getItem('token');
+    if (!tok()) window.location.href = 'login.html';
+
+    const inr = n => parseFloat(n).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+    document.getElementById('todayDate').textContent =
+      new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    // ── LOAD DASHBOARD ──
+    async function loadDashboard() {
+      try {
+        const r = await fetch(`${API}/accounts/dashboard`, { headers:{ Authorization:`Bearer ${tok()}` } });
+        if (r.status===401) { logout(); return; }
+        const d = await r.json();
+        document.getElementById('myAccountBalance').textContent = inr(d.me.balance);
+        document.getElementById('headerName').textContent = d.me.name.split(' ')[0];
+        document.getElementById('navName').textContent    = d.me.name;
+        document.getElementById('navAvatar').textContent  = d.me.name.charAt(0).toUpperCase();
+        // Pre-fill profile modal data
+        document.getElementById('profileAvatar').textContent = d.me.name.charAt(0).toUpperCase();
+        document.getElementById('profileName').textContent   = d.me.name;
+        document.getElementById('profileEmail').textContent  = d.me.email;
+        document.getElementById('profileUpiText').textContent = d.me.upi_id || '—';
+        document.getElementById('profileAccNo').textContent  = d.me.account_number || '—';
+        document.getElementById('profileBalance').textContent = inr(d.me.balance);
+      } catch(e) { console.error(e); }
+    }
+
+    // ── LOAD FULL PROFILE ──
+    async function loadProfile() {
+      try {
+        const r = await fetch(`${API}/auth/profile`, { headers:{ Authorization:`Bearer ${tok()}` } });
+        const d = await r.json();
+        document.getElementById('profileSince').textContent =
+          new Date(d.member_since).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+      } catch(e) {}
+    }
+
+    // Open profile modal → load extra details
+    document.getElementById('profileModal').addEventListener('show.bs.modal', loadProfile);
+
+    // ── LOAD HISTORY ──
+    async function loadHistory() {
+      try {
+        const r    = await fetch(`${API}/transactions/history`, { headers:{ Authorization:`Bearer ${tok()}` } });
+        if (!r.ok) return;
+        const list = await r.json();
+        const tbody  = document.getElementById('tx-body');
+        const myName = document.getElementById('navName').textContent;
+        document.getElementById('txCount').textContent = `${list.length} transaction${list.length!==1?'s':''}`;
+
+        if (!list.length) {
+          tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+            <i class="fas fa-receipt"></i><p>No transactions yet</p>
+            <small class="text-muted">Add money or send to get started</small></div></td></tr>`;
+          document.getElementById('totalSent').textContent      = '₹0';
+          document.getElementById('totalDeposited').textContent = '₹0';
+          document.getElementById('totalTx').textContent        = '0';
+          return;
+        }
+
+        let sent=0, deposited=0;
+        tbody.innerHTML = '';
+        list.forEach(t => {
+          const isDeposit = t.type==='deposit';
+          const isSent    = !isDeposit && t.from_name===myName;
+          const amt       = parseFloat(t.amount);
+          if (isDeposit) deposited+=amt;
+          else if (isSent) sent+=amt;
+
+          const person = isDeposit ? 'Self Deposit' : (isSent ? t.to_name   : t.from_name);
+          const upi    = isDeposit ? '—'            : (isSent ? t.to_upi    : t.from_upi);
+          const d      = new Date(t.created_at);
+          const ds     = d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+          const ts     = d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+          let bc, bl, ac, ap;
+          if (isDeposit) { bc='tx-deposit'; bl='Added';    ac='amt-deposit';  ap='+'; }
+          else if(isSent){ bc='tx-sent';    bl='Sent';     ac='amt-sent';     ap='-'; }
+          else           { bc='tx-received';bl='Received'; ac='amt-received'; ap='+'; }
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><span class="tx-badge ${bc}"><i class="fas fa-${isDeposit?'plus':isSent?'arrow-up':'arrow-down'}"></i>${bl}</span></td>
+            <td><strong style="font-size:13px">${person}</strong></td>
+            <td><code style="font-size:11px;color:#6b87b0">${upi}</code></td>
+            <td><span class="${ac}">${ap}₹${inr(amt)}</span></td>
+            <td><div style="font-size:12px;color:#6b87b0">${ds}</div><div style="font-size:12px;color:#6b87b0">${ts}</div></td>`;
+          tbody.appendChild(tr);
+        });
+        document.getElementById('totalSent').textContent      = '₹'+inr(sent);
+        document.getElementById('totalDeposited').textContent = '₹'+inr(deposited);
+        document.getElementById('totalTx').textContent        = list.length;
+      } catch(e) { console.error(e); }
+    }
+
+    // ── COPY UPI ──
+    function copyUpi() {
+      const upi = document.getElementById('profileUpiText').textContent;
+      navigator.clipboard.writeText(upi).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display='none', 2500);
+      });
+    }
+
+    // ── PIN HELPERS ──
+    function mp(p,i) { if(document.getElementById(p+i).value){ const n=document.getElementById(p+(i+1)); if(n)n.focus(); } }
+    function bp(e,p,i) { if(e.key==='Backspace'&&!document.getElementById(p+i).value&&i>0) document.getElementById(p+(i-1)).focus(); }
+    function gp(p) { return [0,1,2,3].map(i=>document.getElementById(p+i).value).join(''); }
+    function cp(p) { [0,1,2,3].forEach(i=>{ document.getElementById(p+i).value=''; }); }
+
+    // ── SEND MONEY ──
+    let sendModalBS;
+    function openSend() {
+      resetSend();
+      sendModalBS = sendModalBS || new bootstrap.Modal(document.getElementById('sendModal'));
+      sendModalBS.show();
+    }
+    function closeSend() { bootstrap.Modal.getInstance(document.getElementById('sendModal'))?.hide(); resetSend(); }
+    function resetSend() {
+      document.getElementById('s-step1').style.display='block';
+      document.getElementById('s-step2').style.display='none';
+      document.getElementById('sUpi').value='';
+      document.getElementById('sAmt').value='';
+      document.getElementById('upiFound').classList.remove('show');
+      document.getElementById('upiNotFound').style.display='none';
+      cp('sp');
+      ['sErr','spErr','spOk'].forEach(id=>document.getElementById(id).style.display='none');
+      document.getElementById('ss1').className='s-dot active';
+      document.getElementById('ss2').className='s-dot inactive';
+      document.getElementById('sl1').className='s-line inactive';
+    }
+
+    function onUpiInput() {
+      document.getElementById('upiFound').classList.remove('show');
+      document.getElementById('upiNotFound').style.display='none';
+    }
+
+    async function lookupUpi() {
+      const upi = document.getElementById('sUpi').value.trim();
+      if (!upi) return;
+      const btn = document.getElementById('lookupBtn');
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+      btn.disabled = true;
+      try {
+        const r = await fetch(`${API}/transactions/lookup/${encodeURIComponent(upi)}`, {
+          headers:{ Authorization:`Bearer ${tok()}` }
+        });
+        const d = await r.json();
+        if (r.ok) {
+          document.getElementById('upiFoundName').textContent = `✓ ${d.name}`;
+          document.getElementById('upiFound').classList.add('show');
+          document.getElementById('upiNotFound').style.display='none';
+        } else {
+          document.getElementById('upiNotFound').textContent = d.error;
+          document.getElementById('upiNotFound').style.display='block';
+          document.getElementById('upiFound').classList.remove('show');
+        }
+      } catch { document.getElementById('upiNotFound').textContent='Cannot connect to server'; document.getElementById('upiNotFound').style.display='block'; }
+      finally { btn.innerHTML='<i class="fas fa-search"></i>'; btn.disabled=false; }
+    }
+
+    function sendStep2() {
+      const upi = document.getElementById('sUpi').value.trim();
+      const amt = document.getElementById('sAmt').value.trim();
+      const errEl = document.getElementById('sErr');
+      if (!upi) { errEl.textContent='Please enter the recipient UPI ID'; errEl.style.display='block'; return; }
+      if (!amt||parseFloat(amt)<=0) { errEl.textContent='Please enter a valid amount'; errEl.style.display='block'; return; }
+      if (parseFloat(amt)>100000) { errEl.textContent='Amount cannot exceed ₹1,00,000'; errEl.style.display='block'; return; }
+      const foundName = document.getElementById('upiFoundName').textContent.replace('✓ ','');
+      document.getElementById('sSummary').innerHTML =
+        `<strong>To:</strong> ${upi}<br><strong>Name:</strong> ${foundName||'—'}<br><strong>Amount:</strong> ₹${inr(amt)}`;
+      document.getElementById('s-step1').style.display='none';
+      document.getElementById('s-step2').style.display='block';
+      document.getElementById('ss1').className='s-dot done';
+      document.getElementById('ss2').className='s-dot active';
+      document.getElementById('sl1').className='s-line done';
+      setTimeout(()=>document.getElementById('sp0').focus(),80);
+    }
+    function sendBack() {
+      document.getElementById('s-step2').style.display='none';
+      document.getElementById('s-step1').style.display='block';
+      document.getElementById('ss1').className='s-dot active';
+      document.getElementById('ss2').className='s-dot inactive';
+      document.getElementById('sl1').className='s-line inactive';
+      cp('sp');
+      ['spErr','spOk'].forEach(id=>document.getElementById(id).style.display='none');
+    }
+    async function doSend() {
+      const pin = gp('sp');
+      if (pin.length<4) { const e=document.getElementById('spErr'); e.textContent='Please enter the complete 4-digit PIN'; e.style.display='block'; return; }
+      const upi = document.getElementById('sUpi').value.trim();
+      const amt = parseFloat(document.getElementById('sAmt').value);
+      const btn = document.getElementById('sSendBtn');
+      document.getElementById('sSendTxt').style.display='none';
+      document.getElementById('sSpin').style.display='inline-block';
+      btn.disabled=true;
+      ['spErr','spOk'].forEach(id=>document.getElementById(id).style.display='none');
+      try {
+        const r=await fetch(`${API}/transactions/send`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${tok()}`},body:JSON.stringify({upiId:upi,amount:amt,pin})});
+        const d=await r.json();
+        if(r.ok){
+          const ok=document.getElementById('spOk'); ok.textContent=d.message; ok.style.display='block';
+          setTimeout(()=>{ closeSend(); loadDashboard(); loadHistory(); },1800);
+        } else { const e=document.getElementById('spErr'); e.textContent=d.error; e.style.display='block'; cp('sp'); }
+      } catch { const e=document.getElementById('spErr'); e.textContent='Cannot connect to server'; e.style.display='block'; }
+      finally { document.getElementById('sSendTxt').style.display='inline'; document.getElementById('sSpin').style.display='none'; btn.disabled=false; }
+    }
+
+    // ── ADD MONEY ──
+    let addModalBS;
+    function openAdd() {
+      resetAdd();
+      addModalBS = addModalBS || new bootstrap.Modal(document.getElementById('addModal'));
+      addModalBS.show();
+    }
+    function closeAdd() { bootstrap.Modal.getInstance(document.getElementById('addModal'))?.hide(); resetAdd(); }
+    function resetAdd() {
+      document.getElementById('a-step1').style.display='block';
+      document.getElementById('a-step2').style.display='none';
+      document.getElementById('aAmt').value='';
+      cp('ap');
+      ['aErr','apErr','apOk'].forEach(id=>document.getElementById(id).style.display='none');
+      document.getElementById('as1').className='s-dot active-g';
+      document.getElementById('as2').className='s-dot inactive';
+      document.getElementById('al1').className='s-line inactive';
+    }
+    function setA(n) { document.getElementById('aAmt').value=n; document.getElementById('aErr').style.display='none'; }
+    function addStep2() {
+      const amt=document.getElementById('aAmt').value.trim();
+      const errEl=document.getElementById('aErr');
+      if (!amt||parseFloat(amt)<=0){ errEl.textContent='Please enter a valid amount'; errEl.style.display='block'; return; }
+      if (parseFloat(amt)>100000)  { errEl.textContent='Maximum ₹1,00,000 at a time'; errEl.style.display='block'; return; }
+      document.getElementById('aSummary').innerHTML=
+        `<strong>Amount to Add:</strong> ₹${inr(amt)}<br><small class="text-muted">Will be credited after PIN verification</small>`;
+      document.getElementById('a-step1').style.display='none';
+      document.getElementById('a-step2').style.display='block';
+      document.getElementById('as1').className='s-dot done';
+      document.getElementById('as2').className='s-dot active-g';
+      document.getElementById('al1').className='s-line done';
+      setTimeout(()=>document.getElementById('ap0').focus(),80);
+    }
+    function addBack() {
+      document.getElementById('a-step2').style.display='none';
+      document.getElementById('a-step1').style.display='block';
+      document.getElementById('as1').className='s-dot active-g';
+      document.getElementById('as2').className='s-dot inactive';
+      document.getElementById('al1').className='s-line inactive';
+      cp('ap');
+      ['apErr','apOk'].forEach(id=>document.getElementById(id).style.display='none');
+    }
+    async function doAdd() {
+      const pin=gp('ap');
+      if (pin.length<4){ const e=document.getElementById('apErr'); e.textContent='Please enter the complete 4-digit PIN'; e.style.display='block'; return; }
+      const amt=parseFloat(document.getElementById('aAmt').value);
+      const btn=document.getElementById('aAddBtn');
+      document.getElementById('aAddTxt').style.display='none';
+      document.getElementById('aSpin').style.display='inline-block';
+      btn.disabled=true;
+      ['apErr','apOk'].forEach(id=>document.getElementById(id).style.display='none');
+      try {
+        const r=await fetch(`${API}/auth/add-money`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${tok()}`},body:JSON.stringify({amount:amt,pin})});
+        const d=await r.json();
+        if(r.ok){ const ok=document.getElementById('apOk'); ok.textContent=d.message; ok.style.display='block'; setTimeout(()=>{ closeAdd(); loadDashboard(); loadHistory(); },1800); }
+        else { const e=document.getElementById('apErr'); e.textContent=d.error; e.style.display='block'; cp('ap'); }
+      } catch { const e=document.getElementById('apErr'); e.textContent='Cannot connect to server'; e.style.display='block'; }
+      finally { document.getElementById('aAddTxt').style.display='inline'; document.getElementById('aSpin').style.display='none'; btn.disabled=false; }
+    }
+
+    function logout() { localStorage.removeItem('token'); localStorage.removeItem('lastLoginName'); window.location.href='login.html'; }
+    loadDashboard().then(()=>loadHistory());
+  </script>
+
+  <!-- ══ QR SCANNER MODAL ══ -->
+  <div class="modal fade" id="scannerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius:20px">
+        <div class="modal-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0" style="color:#0a1628">
+              <i class="fas fa-camera text-primary me-2"></i>Scan QR Code
+            </h5>
+            <button class="btn-close" onclick="closeScanner()"></button>
+          </div>
+
+          <div class="alert alert-info py-2 mb-3" style="font-size:13px;border-radius:10px">
+            <i class="fas fa-info-circle me-1"></i>Point your camera at a Unity Bank QR code to pay
+          </div>
+
+          <!-- Camera view -->
+          <div id="scannerView" style="display:block">
+            <div style="position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:1">
+              <video id="qrVideo" style="width:100%;height:100%;object-fit:cover" playsinline></video>
+              <canvas id="qrCanvas" style="display:none"></canvas>
+              <!-- Scan frame overlay -->
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                <div style="width:200px;height:200px;border:3px solid #2563eb;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.4)">
+                  <div style="position:absolute;top:-3px;left:-3px;width:24px;height:24px;border-top:4px solid #60a5fa;border-left:4px solid #60a5fa;border-radius:4px 0 0 0"></div>
+                  <div style="position:absolute;top:-3px;right:-3px;width:24px;height:24px;border-top:4px solid #60a5fa;border-right:4px solid #60a5fa;border-radius:0 4px 0 0"></div>
+                  <div style="position:absolute;bottom:-3px;left:-3px;width:24px;height:24px;border-bottom:4px solid #60a5fa;border-left:4px solid #60a5fa;border-radius:0 0 0 4px"></div>
+                  <div style="position:absolute;bottom:-3px;right:-3px;width:24px;height:24px;border-bottom:4px solid #60a5fa;border-right:4px solid #60a5fa;border-radius:0 0 4px 0"></div>
+                </div>
+              </div>
+              <div id="scanLine" style="position:absolute;left:calc(50% - 97px);top:calc(50% - 97px);width:194px;height:2px;background:linear-gradient(90deg,transparent,#2563eb,transparent);animation:scanAnim 2s linear infinite"></div>
+            </div>
+            <p class="text-muted text-center mt-2 mb-0" style="font-size:13px" id="scanStatus">Scanning...</p>
+          </div>
+
+          <!-- After scan result -->
+          <div id="scanResult" style="display:none">
+            <div class="alert alert-success py-3 mb-3" style="border-radius:12px">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="fas fa-check-circle fa-lg text-success"></i>
+                <strong>QR Code Detected!</strong>
+              </div>
+              <div style="font-size:13px">
+                <div><strong>UPI ID:</strong> <span id="scannedUpi" style="font-family:monospace"></span></div>
+                <div><strong>Name:</strong> <span id="scannedName"></span></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold" style="font-size:12px">Amount to Pay (₹ INR)</label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" id="scanAmt" class="form-control" placeholder="0.00" min="1" max="100000">
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary flex-fill" onclick="rescan()">
+                <i class="fas fa-redo me-1"></i>Scan Again
+              </button>
+              <button class="btn btn-primary flex-fill fw-bold" onclick="proceedFromScan()">
+                Proceed to Pay <i class="fas fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes scanAnim { 0%{top:calc(50% - 97px)} 50%{top:calc(50% + 94px)} 100%{top:calc(50% - 97px)} }
+  </style>
+
+  <!-- QR Code Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+  <script>
+    // ── MY QR CODE (show in profile modal) ──
+    let qrGenerated = false;
+
+    function toggleMyQR() {
+      const section = document.getElementById('myQrSection');
+      const btn     = document.getElementById('showQrBtn');
+      const isOpen  = section.style.display !== 'none';
+
+      if (isOpen) {
+        section.style.display = 'none';
+        btn.innerHTML = '<i class="fas fa-qrcode me-2"></i>Show My QR Code';
+        return;
+      }
+
+      section.style.display = 'block';
+      btn.innerHTML = '<i class="fas fa-times me-2"></i>Hide QR Code';
+
+      if (!qrGenerated) {
+        const upi = document.getElementById('profileUpiText').textContent;
+        if (!upi || upi === '—') return;
+
+        // Clear and generate
+        const container = document.getElementById('myQrCode');
+        container.innerHTML = '';
+
+        new QRCode(container, {
+          text:          upi,
+          width:         200,
+          height:        200,
+          colorDark:     '#0a1628',
+          colorLight:    '#ffffff',
+          correctLevel:  QRCode.CorrectLevel.H
+        });
+
+        document.getElementById('qrUpiLabel').textContent = upi;
+        qrGenerated = true;
+      }
+    }
+
+    function downloadQR() {
+      const upi       = document.getElementById('profileUpiText').textContent;
+      const container = document.getElementById('myQrCode');
+      // qrcodejs creates either a canvas or an img depending on browser
+      const canvas = container.querySelector('canvas');
+      const img    = container.querySelector('img');
+      const link   = document.createElement('a');
+      link.download = 'unity-bank-qr-' + upi + '.png';
+      if (canvas) {
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } else if (img) {
+        link.href = img.src;
+        link.click();
+      }
+    }
+
+    // Reset QR when profile modal closes
+    document.getElementById('profileModal').addEventListener('hidden.bs.modal', () => {
+      document.getElementById('myQrSection').style.display = 'none';
+      document.getElementById('showQrBtn').innerHTML = '<i class="fas fa-qrcode me-2"></i>Show My QR Code';
+      qrGenerated = false;
+    });
+
+    // ── QR SCANNER ──
+    let scannerStream = null;
+    let scanInterval  = null;
+    let scannerModalBS;
+
+    function openScanner() {
+      scannerModalBS = scannerModalBS || new bootstrap.Modal(document.getElementById('scannerModal'));
+      document.getElementById('scannerView').style.display = 'block';
+      document.getElementById('scanResult').style.display  = 'none';
+      document.getElementById('scanStatus').textContent    = 'Scanning...';
+      scannerModalBS.show();
+      setTimeout(startCamera, 400);
+    }
+
+    function closeScanner() {
+      stopCamera();
+      bootstrap.Modal.getInstance(document.getElementById('scannerModal'))?.hide();
+    }
+
+    async function startCamera() {
+      try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+        const video = document.getElementById('qrVideo');
+        video.srcObject = scannerStream;
+        await video.play();
+        scanInterval = setInterval(scanFrame, 300);
+      } catch (err) {
+        document.getElementById('scanStatus').textContent = 'Camera access denied. Please allow camera permission.';
+        document.getElementById('scanStatus').style.color = '#ef4444';
+      }
+    }
+
+    function stopCamera() {
+      clearInterval(scanInterval);
+      scanInterval = null;
+      if (scannerStream) {
+        scannerStream.getTracks().forEach(t => t.stop());
+        scannerStream = null;
+      }
+    }
+
+    async function scanFrame() {
+      const video  = document.getElementById('qrVideo');
+      const canvas = document.getElementById('qrCanvas');
+      if (!video.videoWidth) return;
+
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx  = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code      = jsQR(imageData.data, imageData.width, imageData.height);
+
+      if (code && code.data.includes('@unitybank')) {
+        stopCamera();
+        await showScanResult(code.data);
+      }
+    }
+
+    async function showScanResult(upiId) {
+      document.getElementById('scannerView').style.display = 'none';
+      document.getElementById('scanResult').style.display  = 'block';
+      document.getElementById('scannedUpi').textContent    = upiId;
+      document.getElementById('scannedName').textContent   = 'Looking up...';
+
+      // Lookup name from UPI ID
+      try {
+        const r = await fetch(`${API}/transactions/lookup/${encodeURIComponent(upiId)}`, {
+          headers: { Authorization: `Bearer ${tok()}` }
+        });
+        const d = await r.json();
+        document.getElementById('scannedName').textContent = r.ok ? d.name : 'Unknown';
+      } catch {
+        document.getElementById('scannedName').textContent = 'Could not verify';
+      }
+    }
+
+    function rescan() {
+      document.getElementById('scannerView').style.display = 'block';
+      document.getElementById('scanResult').style.display  = 'none';
+      document.getElementById('scanAmt').value             = '';
+      document.getElementById('scanStatus').textContent    = 'Scanning...';
+      document.getElementById('scanStatus').style.color    = '';
+      startCamera();
+    }
+
+    function proceedFromScan() {
+      const upi = document.getElementById('scannedUpi').textContent;
+      const amt = document.getElementById('scanAmt').value.trim();
+      const name = document.getElementById('scannedName').textContent;
+
+      if (!amt || parseFloat(amt) <= 0) {
+        alert('Please enter an amount to pay');
+        return;
+      }
+
+      // Close scanner and pre-fill send modal
+      closeScanner();
+      setTimeout(() => {
+        openSend();
+        document.getElementById('sUpi').value = upi;
+        document.getElementById('sAmt').value = amt;
+        // Show found name
+        document.getElementById('upiFoundName').textContent = '✓ ' + name;
+        document.getElementById('upiFound').classList.add('show');
+      }, 500);
+    }
+
+    // Stop camera when modal closes
+    document.getElementById('scannerModal').addEventListener('hidden.bs.modal', stopCamera);
+  </script>
+
+</body>
+</html>
