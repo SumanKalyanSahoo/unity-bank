@@ -34,7 +34,7 @@
       overflow-x: hidden;
     }
 
-    /* ── NAVBAR ── */
+    /* NAVBAR */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -116,7 +116,7 @@
     }
     .btn-nav-cta:hover { background: var(--blue); transform: translateY(-1px); }
 
-    /* ── HERO ── */
+    /*  HERO  */
     .hero {
       min-height: 100vh;
       background: var(--navy);
@@ -126,7 +126,7 @@
       overflow: hidden;
     }
 
-    /* Geometric background pattern */
+    /* Geometric background */
     .hero-bg {
       position: absolute;
       inset: 0;
@@ -276,8 +276,8 @@
       color: rgba(255,255,255,0.5);
     }
     .trust-item i { color: var(--success); font-size: 11px; }
-
-    /* Hero right — floating cards */
+    
+    /* Right Hero — floating card */
     .hero-visual {
       position: relative;
       height: 420px;
@@ -624,7 +624,7 @@
     }
     .social-link:hover { background: var(--blue-mid); color: white; border-color: var(--blue-mid); }
 
-    /* ── RESPONSIVE ── */
+    /* Scaling */
     @media (max-width: 768px) {
       nav { padding: 0 1.2rem; }
       .nav-links { display: none; }
@@ -640,7 +640,7 @@
       .footer-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
     }
 
-    /* Entrance animations */
+    /* Entry animations */
     .fade-up {
       opacity: 0;
       transform: translateY(30px);
@@ -860,15 +860,15 @@
   </footer>
 
   <script>
-    // Sticky navbar on scroll
+
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       navbar.classList.toggle('scrolled', window.scrollY > 40);
     });
-    // Add scrolled class immediately if page loads scrolled
+  
     if (window.scrollY > 40) navbar.classList.add('scrolled');
 
-    // Scroll-triggered fade-up animations
+    
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -880,7 +880,7 @@
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // If already logged in, change CTA buttons to "Go to Dashboard"
+    
     if (localStorage.getItem('token')) {
       document.querySelectorAll('a[href="register.html"]').forEach(a => {
         a.href = 'customers.html';
