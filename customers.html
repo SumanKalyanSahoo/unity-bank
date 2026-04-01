@@ -839,11 +839,11 @@
         container.innerHTML = '';
 
         new QRCode(container, {
-          text:          upi,
-          width:         200,
-          height:        200,
-          colorDark:     '#0a1628',
-          colorLight:    '#ffffff',
+          text: upi,
+          width: 200,
+          height: 200,
+          colorDark: '#0a1628',
+          colorLight: '#ffffff',
           correctLevel:  QRCode.CorrectLevel.H
         });
 
@@ -855,7 +855,7 @@
     function downloadQR() {
       const upi       = document.getElementById('profileUpiText').textContent;
       const container = document.getElementById('myQrCode');
-      // qrcodejs creates either a canvas or an img depending on browser
+      
       const canvas = container.querySelector('canvas');
       const img    = container.querySelector('img');
       const link   = document.createElement('a');
@@ -943,7 +943,7 @@
       document.getElementById('scannedUpi').textContent    = upiId;
       document.getElementById('scannedName').textContent   = 'Looking up...';
 
-      // Lookup name from UPI ID
+      // Looking up  name from UPI IDs
       try {
         const r = await fetch(`${API}/transactions/lookup/${encodeURIComponent(upiId)}`, {
           headers: { Authorization: `Bearer ${tok()}` }
@@ -974,19 +974,19 @@
         return;
       }
 
-      // Close scanner and pre-fill send modal
+      
       closeScanner();
       setTimeout(() => {
         openSend();
         document.getElementById('sUpi').value = upi;
         document.getElementById('sAmt').value = amt;
-        // Show found name
+        
         document.getElementById('upiFoundName').textContent = '✓ ' + name;
         document.getElementById('upiFound').classList.add('show');
       }, 500);
     }
 
-    // Stop camera when modal closes
+    
     document.getElementById('scannerModal').addEventListener('hidden.bs.modal', stopCamera);
   </script>
 
